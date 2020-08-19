@@ -26,12 +26,13 @@ class HomeView: UIView {
     private func layoutView() {
         backgroundColor = .white
         
-        tableView.rowHeight = 50
+        tableView.rowHeight = Constants.rowHeight
         addSubview(tableView)
         tableView.tableHeaderView = searchController.searchBar
         
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(snp.topMargin)
+            make.leading.trailing.bottom.equalToSuperview()
         }
         
     }
