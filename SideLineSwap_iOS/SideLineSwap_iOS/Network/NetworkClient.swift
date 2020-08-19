@@ -10,9 +10,11 @@ import UIKit
 
 class NetworkClient {
     // TODO: Error handling and clean up
-    func get(completion: @escaping (ItemResponseModel) -> Void) {
-        let urlStr = "https://api.staging.sidelineswap.com/v1/facet_items?q=nike%20bag&page=2"
-        guard let url = URL(string: urlStr) else { return }
+    func get(searchString: String, page: Int, completion: @escaping (ItemResponseModel) -> Void) {
+        let rawUrlStr = Constants.getItemsUrlStr
+        let urlStr = String(format: rawUrlStr, searchString, page)
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        guard let sanitizedStr = urlStr, let url = URL(string: sanitizedStr) else { return }
         URLSession.shared.dataTask(with: url) { data, _, error in
             if let data = data {
                 let jsonDecoder = JSONDecoder()

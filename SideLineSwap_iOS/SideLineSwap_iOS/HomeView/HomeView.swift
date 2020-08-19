@@ -12,7 +12,8 @@ import SnapKit
 class HomeView: UIView {
     
     let tableView = UITableView()
-    private let searchController = UISearchController(searchResultsController: nil)
+    let searchController = UISearchController(searchResultsController: nil)
+    private let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,11 +31,29 @@ class HomeView: UIView {
         addSubview(tableView)
         tableView.tableHeaderView = searchController.searchBar
         
+        loadingIndicator.transform = CGAffineTransform(scaleX: 2, y: 2)
+        addSubview(loadingIndicator)
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
         tableView.snp.makeConstraints { make in
             make.top.equalTo(snp.topMargin)
             make.leading.trailing.bottom.equalToSuperview()
         }
         
+    }
+    
+    func showLoadingIndicator() {
+        alpha = 0.7
+        loadingIndicator.startAnimating()
+        loadingIndicator.backgroundColor = .white
+    }
+    
+    func hideLoadingIndicator() {
+        alpha = 1
+        loadingIndicator.stopAnimating()
+        loadingIndicator.hidesWhenStopped = true
     }
     
 }

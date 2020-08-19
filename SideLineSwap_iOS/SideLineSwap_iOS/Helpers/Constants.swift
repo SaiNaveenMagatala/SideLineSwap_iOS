@@ -12,4 +12,5 @@ struct Constants {
     static let rowHeight: CGFloat = 70
     static let imageCornerRadius: CGFloat = 35 // rowHeight / 2
     static let placeHolderImage = "placeHolder"
+    static let getItemsUrlStr = "https://api.staging.sidelineswap.com/v1/facet_items?q=%@&page=%d"
 }
