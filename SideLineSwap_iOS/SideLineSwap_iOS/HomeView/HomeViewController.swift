@@ -13,6 +13,7 @@ class HomeViewController: UIViewController {
     private let rootView = HomeView()
     private let viewModel = HomeViewModel()
     private var data = [CellModel]()
+    private let cache = NSCache<NSString, UIImage>()
     
     override func loadView() {
         view = rootView
@@ -20,7 +21,11 @@ class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Search Results"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
         rootView.tableView.dataSource = self
+        rootView.tableView.delegate = self
         rootView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell.self")
         
         viewModel.getItems { cellModels in
@@ -32,35 +37,18 @@ class HomeViewController: UIViewController {
     }
 }
 
-extension HomeViewController: UITableViewDataSource {
+extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return data.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "UITableViewCell.self")
-        cell.configure(with: data[indexPath.row], tableView: tableView, indexPath: indexPath)
+        cell.selectionStyle = .none
+        cell.configure(with: data[indexPath.row], tableView: tableView, indexPath: indexPath, cache: cache)
         return cell
     }
-}
-
-extension UITableViewCell {
-    func configure(with cellModel: CellModel, tableView: UITableView, indexPath: IndexPath) {
-        textLabel?.text = cellModel.title
-        detailTextLabel?.text = cellModel.sellerName
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 25))
-        label.text = cellModel.price
-        accessoryView = label
-        // TODO: Handle image fetching
-        DispatchQueue.global(qos: .background).async {
-            if let urlStr = cellModel.imageUrl, let url = URL(string: urlStr) {
-                let data = try! Data(contentsOf: url, options: .mappedRead)
-                DispatchQueue.main.async {
-                    self.imageView?.image = UIImage(data: data)
-                    tableView.reloadRows(at: [indexPath], with: .automatic)
-                }
-            }
-        }
-    }
+    
+    
 }
 
