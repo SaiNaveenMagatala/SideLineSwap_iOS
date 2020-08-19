@@ -28,12 +28,11 @@ class HomeViewController: UIViewController {
         rootView.tableView.delegate = self
         rootView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell.self")
         
-        viewModel.getItems { cellModels in
-            self.data = cellModels
-            DispatchQueue.main.async {
-                self.rootView.tableView.reloadData()
-            }
-        }
+        rootView.searchController.searchBar.delegate = self
+    }
+    
+    private func resetData() {
+        data = []
     }
 }
 
@@ -48,7 +47,23 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: data[indexPath.row], tableView: tableView, indexPath: indexPath, cache: cache)
         return cell
     }
-    
-    
+}
+
+extension HomeViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        resetData()
+        rootView.tableView.reloadData()
+        rootView.searchController.dismiss(animated: true, completion: nil)
+        rootView.showLoadingIndicator()
+        if let searchString = searchBar.text {
+            viewModel.getItems(searchString: searchString, page: 1) { cellModels in
+                self.data = cellModels
+                DispatchQueue.main.async {
+                    self.rootView.hideLoadingIndicator()
+                    self.rootView.tableView.reloadData()
+                }
+            }
+        }
+    }
 }
 

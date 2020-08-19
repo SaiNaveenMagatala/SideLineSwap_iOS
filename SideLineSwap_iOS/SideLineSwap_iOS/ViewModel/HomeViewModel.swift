@@ -12,8 +12,8 @@ class HomeViewModel {
     // TODO: Inject and unit test?
     let networkClient = NetworkClient()
     
-    func getItems(completion: @escaping ([CellModel]) -> Void) {
-        networkClient.get { response in
+    func getItems(searchString: String, page: Int, completion: @escaping ([CellModel]) -> Void) {
+        networkClient.get(searchString: searchString, page: page) { response in
             let cellModels = response.data.map {
                 CellModel(title: $0.name,
                           price: $0.price.dropTrailingZeroes + "$",
