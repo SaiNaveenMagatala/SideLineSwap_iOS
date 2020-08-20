@@ -8,9 +8,14 @@
 
 import UIKit
 
+enum SearchError: Error {
+    case disconnectedNetwork
+    case backendError
+}
+
 class NetworkClient {
     // TODO: Error handling and clean up
-    func get(searchString: String, page: Int, completion: @escaping (ItemResponseModel) -> Void) {
+    func get(searchString: String, page: Int, completion: @escaping (Result<ItemResponseModel, SearchError>) -> Void) {
         let rawUrlStr = Constants.getItemsUrlStr
         let urlStr = String(format: rawUrlStr, searchString, page)
             .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
@@ -19,7 +24,7 @@ class NetworkClient {
             if let data = data {
                 let jsonDecoder = JSONDecoder()
                 if let model = try? jsonDecoder.decode(ItemResponseModel.self, from: data) {
-                    completion(model)
+                    completion(.success(model))
                 }
             }
         }.resume()

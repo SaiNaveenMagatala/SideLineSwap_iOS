@@ -47,8 +47,13 @@ extension HomeViewController: UITableViewDataSource {
         }
         
         if indexPath.row == viewModel.data.count - 10 {
-            viewModel.getItems(searchString: searchString) { indexPathsToReload in
-                self.rootView.tableView.insertRows(at: indexPathsToReload, with: .automatic)
+            viewModel.getItems(searchString: searchString) { result in
+                switch result {
+                case let .success(indexPathsToInsert):
+                    self.rootView.tableView.insertRows(at: indexPathsToInsert, with: .automatic)
+                case .failure:
+                    break
+                }
             }
         }
         return cell
@@ -57,13 +62,13 @@ extension HomeViewController: UITableViewDataSource {
 
 extension HomeViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        viewModel.resetData()
-        rootView.tableView.reloadData()
         rootView.searchController.dismiss(animated: true, completion: nil)
-        rootView.showLoadingIndicator()
-        if let searchString = searchBar.text {
+        if let searchString = searchBar.text, searchString != self.searchString {
             self.searchString = searchString
-            viewModel.getItems(searchString: searchString) { cellModels in
+            viewModel.resetData()
+            rootView.tableView.reloadData()
+            rootView.showLoadingIndicator()
+            viewModel.getItems(searchString: searchString) { _ in
                 self.rootView.hideLoadingIndicator()
                 self.rootView.tableView.reloadData()
             }
