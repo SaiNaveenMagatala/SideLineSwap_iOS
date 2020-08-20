@@ -12,8 +12,8 @@ class HomeViewController: UIViewController {
     
     private let rootView = HomeView()
     private let viewModel = HomeViewModel()
-    private var data = [CellModel]()
     private let cache = NSCache<NSString, UIImage>()
+    private var searchString = ""
     
     override func loadView() {
         view = rootView
@@ -25,43 +25,63 @@ class HomeViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         rootView.tableView.dataSource = self
-        rootView.tableView.delegate = self
+        rootView.tableView.prefetchDataSource = self
         rootView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell.self")
         
         rootView.searchController.searchBar.delegate = self
     }
     
-    private func resetData() {
-        data = []
+    func getVisibleIndexPathsToReload(indexPathsToReload: [IndexPath]) -> [IndexPath] {
+        if let visbleIndexPaths = rootView.tableView.indexPathsForVisibleRows {
+            let set = Set(visbleIndexPaths)
+            return Array(set.intersection(indexPathsToReload))
+        }
+        return []
     }
 }
 
-extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
+extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data.count
+        return viewModel.total
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "UITableViewCell.self")
         cell.selectionStyle = .none
-        cell.configure(with: data[indexPath.row], tableView: tableView, indexPath: indexPath, cache: cache)
+        if indexPath.row < viewModel.data.count {
+            cell.configure(with: viewModel.data[indexPath.row],
+                           tableView: tableView,
+                           indexPath: indexPath,
+                           cache: cache)
+        } else {
+            // put some loading spinner
+        }
         return cell
+    }
+}
+
+extension HomeViewController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        if indexPaths.contains(where: { $0.row > viewModel.data.count }) {
+            viewModel.getItems(searchString: searchString) { indexPathsToReload in
+                let visibleIndexPathsToReload = self.getVisibleIndexPathsToReload(indexPathsToReload: indexPathsToReload)
+                self.rootView.tableView.reloadRows(at: visibleIndexPathsToReload, with: .automatic)
+            }
+        }
     }
 }
 
 extension HomeViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        resetData()
+        viewModel.resetData()
         rootView.tableView.reloadData()
         rootView.searchController.dismiss(animated: true, completion: nil)
         rootView.showLoadingIndicator()
         if let searchString = searchBar.text {
-            viewModel.getItems(searchString: searchString, page: 1) { cellModels in
-                self.data = cellModels
-                DispatchQueue.main.async {
-                    self.rootView.hideLoadingIndicator()
-                    self.rootView.tableView.reloadData()
-                }
+            self.searchString = searchString
+            viewModel.getItems(searchString: searchString) { cellModels in
+                self.rootView.hideLoadingIndicator()
+                self.rootView.tableView.reloadData()
             }
         }
     }

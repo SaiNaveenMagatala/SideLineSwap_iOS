@@ -25,7 +25,7 @@ class HomeView: UIView {
     }
     
     private func layoutView() {
-        backgroundColor = .white
+        backgroundColor = .systemGray
         
         tableView.rowHeight = Constants.rowHeight
         addSubview(tableView)
