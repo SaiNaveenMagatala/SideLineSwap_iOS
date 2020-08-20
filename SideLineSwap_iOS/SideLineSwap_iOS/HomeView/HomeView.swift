@@ -25,7 +25,9 @@ class HomeView: UIView {
     }
     
     private func layoutView() {
-        backgroundColor = .white
+        backgroundColor = .systemGray
+        
+        searchController.searchBar.placeholder = Constants.placeHolderText
         
         tableView.rowHeight = Constants.rowHeight
         addSubview(tableView)

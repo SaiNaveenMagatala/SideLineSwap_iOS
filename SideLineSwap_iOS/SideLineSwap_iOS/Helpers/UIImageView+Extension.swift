@@ -31,5 +31,11 @@ extension UIImageView {
     func setRoundedCornors() {
         clipsToBounds = true
         layer.cornerRadius = Constants.imageCornerRadius
+        
+        snp.makeConstraints { make in
+            make.height.width.equalTo(60)
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
+        }
     }
 }

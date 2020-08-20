@@ -10,10 +10,10 @@ import Foundation
 
 struct ItemResponseModel: Decodable {
     let data: [ItemModel]
+    let meta: Meta
 }
 
 struct ItemModel: Decodable {
-
     let name: String
     let price: Double
     let images: [Image]
@@ -33,5 +33,16 @@ struct ItemModel: Decodable {
     
     struct Badge: Decodable {
         let name: String
+    }
+}
+
+struct Meta: Decodable {
+    let paging: Paging
+    struct Paging: Decodable {
+        let total: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case total = "total_count"
+        }
     }
 }
