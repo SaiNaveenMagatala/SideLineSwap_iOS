@@ -82,6 +82,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
 extension HomeViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         rootView.searchBar.resignFirstResponder()
+        rootView.searchBar.setShowsCancelButton(false, animated: true)
         if let searchString = searchBar.text, searchString != self.searchString {
             self.searchString = searchString
             viewModel.resetData()
@@ -92,6 +93,15 @@ extension HomeViewController: UISearchBarDelegate {
                 self.rootView.collectionView.reloadData()
             }
         }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        rootView.searchBar.resignFirstResponder()
+        rootView.searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        self.rootView.searchBar.setShowsCancelButton(true, animated: true)
     }
 }
 
