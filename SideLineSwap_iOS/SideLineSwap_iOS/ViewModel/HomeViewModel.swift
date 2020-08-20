@@ -16,23 +16,28 @@ class HomeViewModel {
     var total = 0
     var data = [CellModel]()
     
-    func getItems(searchString: String, completion: @escaping ([IndexPath]) -> Void) {
-        guard !isFetching, (data.count != 0 || data.count < total) else { return }
+    func getItems(searchString: String, completion: @escaping (Result<[IndexPath], SearchError>) -> Void) {
+        guard !isFetching, (data.count == 0 || data.count < total) else { return }
         isFetching = true
         self.currentPage += 1
-        networkClient.get(searchString: searchString, page: currentPage) { response in
-            self.total = response.meta.paging.total
-            let cellModels = response.data.map {
-                CellModel(title: $0.name,
-                          price: "$" + $0.price.dropTrailingZeroes,
-                          sellerName: $0.seller.badges.first?.name,
-                          imageUrl: $0.images.first?.thumbUrl)
-            }
-            DispatchQueue.main.async {
-                let indexPathsToReload = self.calculateIndexPathsToReload(itemCount: cellModels.count)
-                self.isFetching = false
-                self.data.append(contentsOf: cellModels)
-                completion(indexPathsToReload)
+        networkClient.get(searchString: searchString, page: currentPage) { result in
+            switch result {
+            case let .success(response):
+                self.total = response.meta.paging.total
+                let cellModels = response.data.map {
+                    CellModel(title: $0.name,
+                              price: "$" + $0.price.dropTrailingZeroes,
+                              sellerName: $0.seller.badges.first?.name,
+                              imageUrl: $0.images.first?.thumbUrl)
+                }
+                DispatchQueue.main.async {
+                    let indexPathsToReload = self.calculateIndexPathsToReload(itemCount: cellModels.count)
+                    self.isFetching = false
+                    self.data.append(contentsOf: cellModels)
+                    completion(.success(indexPathsToReload))
+                }
+            case let .failure(error):
+                completion(.failure(error))
             }
         }
     }
