@@ -11,8 +11,9 @@ import SnapKit
 
 class HomeView: UIView {
     
-    let tableView = UITableView()
-    let searchController = UISearchController(searchResultsController: nil)
+    lazy var collectionViewLayout = UICollectionViewFlowLayout()
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
+    let searchBar = UISearchBar()
     private let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
     
     override init(frame: CGRect) {
@@ -25,13 +26,7 @@ class HomeView: UIView {
     }
     
     private func layoutView() {
-        backgroundColor = .systemGray
-        
-        searchController.searchBar.placeholder = Constants.placeHolderText
-        
-        tableView.rowHeight = Constants.rowHeight
-        addSubview(tableView)
-        tableView.tableHeaderView = searchController.searchBar
+        backgroundColor = UIColor.white.withAlphaComponent(0.95)
         
         loadingIndicator.transform = CGAffineTransform(scaleX: 2, y: 2)
         addSubview(loadingIndicator)
@@ -39,8 +34,18 @@ class HomeView: UIView {
             make.center.equalToSuperview()
         }
         
-        tableView.snp.makeConstraints { make in
+        addSubview(searchBar)
+        searchBar.placeholder = Constants.placeHolderText
+        searchBar.snp.makeConstraints { make in
             make.top.equalTo(snp.topMargin)
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(50)
+        }
+        
+        addSubview(collectionView)
+        collectionView.backgroundColor = .clear
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom).offset(10)
             make.leading.trailing.bottom.equalToSuperview()
         }
         

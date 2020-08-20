@@ -28,7 +28,7 @@ class HomeViewModel {
                     CellModel(title: $0.name,
                               price: "$" + $0.price.dropTrailingZeroes,
                               sellerName: $0.seller.badges.first?.name,
-                              imageUrl: $0.images.first?.thumbUrl)
+                              imageUrl: $0.images.first?.smallUrl)
                 }
                 DispatchQueue.main.async {
                     let indexPathsToReload = self.calculateIndexPathsToReload(itemCount: cellModels.count)
