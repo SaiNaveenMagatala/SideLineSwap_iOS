@@ -17,7 +17,7 @@ class HomeViewModel {
     var data = [CellModel]()
     
     func getItems(searchString: String, completion: @escaping ([IndexPath]) -> Void) {
-        guard !isFetching else { return }
+        guard !isFetching, (data.count != 0 || data.count < total) else { return }
         isFetching = true
         self.currentPage += 1
         networkClient.get(searchString: searchString, page: currentPage) { response in
