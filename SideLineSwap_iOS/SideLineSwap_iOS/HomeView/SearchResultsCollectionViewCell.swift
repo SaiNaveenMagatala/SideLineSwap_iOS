@@ -15,13 +15,6 @@ class SearchResultsCollectionViewCell: UICollectionViewCell {
     private let itemNameLabel = UILabel()
     private let sellerNameLabel = UILabel()
     
-    private let containerStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 5
-        return stackView
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutView()
@@ -32,26 +25,50 @@ class SearchResultsCollectionViewCell: UICollectionViewCell {
     }
     
     private func layoutView() {
+        backgroundColor = .white
+        setShadow()
+        
         itemImageView.addSubview(priceLabel)
-        
-        itemImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(100)
-        }
-        
+        priceLabel.textColor = .white
+        priceLabel.font = UIFont.systemFont(ofSize: 15, weight: .bold)
         priceLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(10)
-            make.bottom.equalToSuperview().offset(10)
+            make.leading.equalToSuperview().offset(Constants.defaultMargin)
+            make.bottom.equalToSuperview().inset(Constants.defaultMargin)
         }
         
-        containerStackView.addArrangedSubview(itemImageView)
-        containerStackView.addArrangedSubview(itemNameLabel)
-        containerStackView.addArrangedSubview(sellerNameLabel)
-        
-        contentView.addSubview(containerStackView)
-        
-        containerStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        contentView.addSubview(itemImageView)
+        itemImageView.clipsToBounds = true
+        itemImageView.snp.makeConstraints { make in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(itemImageView.snp.width)
         }
+        
+        contentView.addSubview(itemNameLabel)
+        itemNameLabel.numberOfLines = 2
+        itemNameLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        itemNameLabel.snp.makeConstraints { make in
+            make.top.equalTo(itemImageView.snp.bottom).offset(5)
+            make.trailing.equalToSuperview().inset(5)
+            make.leading.equalToSuperview().offset(Constants.defaultMargin)
+        }
+        
+        contentView.addSubview(sellerNameLabel)
+        sellerNameLabel.snp.makeConstraints { make in
+            make.top.equalTo(itemNameLabel.snp.bottom).offset(2)
+            make.trailing.equalToSuperview().inset(5)
+            make.leading.equalToSuperview().offset(Constants.defaultMargin)
+        }
+        sellerNameLabel.font = UIFont.systemFont(ofSize: 12, weight: .light)
+    }
+    
+    private func setShadow() {
+        itemImageView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        itemImageView.layer.cornerRadius = 5
+        layer.cornerRadius = 5
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.2
+        layer.shadowOffset = .zero
+        layer.shadowRadius = 5
     }
     
     func configure(with cellModel: CellModel,

@@ -24,25 +24,27 @@ class HomeViewController: UIViewController {
         title = "Search Results"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        rootView.tableView.dataSource = self
-        rootView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell.self")
+        rootView.collectionView.dataSource = self
+        rootView.collectionView.delegate = self
+        rootView.collectionView.register(SearchResultsCollectionViewCell.self,
+                                         forCellWithReuseIdentifier: "SearchResultsCollectionViewCell.self")
         
-        rootView.searchController.searchBar.delegate = self
+        rootView.searchBar.delegate = self
     }
 }
 
-extension HomeViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.data.count
+extension HomeViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        viewModel.data.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "UITableViewCell.self")
-        cell.selectionStyle = .none
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView
+            .dequeueReusableCell(withReuseIdentifier: "SearchResultsCollectionViewCell.self",
+                                 for: indexPath) as? SearchResultsCollectionViewCell else { fatalError() }
         if indexPath.row < viewModel.data.count {
             cell.configure(with: viewModel.data[indexPath.row],
-                           tableView: tableView,
-                           indexPath: indexPath,
                            cache: cache)
         }
         
@@ -50,7 +52,7 @@ extension HomeViewController: UITableViewDataSource {
             viewModel.getItems(searchString: searchString) { result in
                 switch result {
                 case let .success(indexPathsToInsert):
-                    self.rootView.tableView.insertRows(at: indexPathsToInsert, with: .automatic)
+                    self.rootView.collectionView.insertItems(at: indexPathsToInsert)
                 case .failure:
                     break
                 }
@@ -60,17 +62,34 @@ extension HomeViewController: UITableViewDataSource {
     }
 }
 
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let viewWidth = view.frame.width
+        let padding = Constants.defaultMargin * 3
+        let width = (viewWidth - padding) / Constants.numberOfCellsInRow
+        return CGSize(width: width, height: width + 70)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        Constants.defaultMargin
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 0, left: Constants.defaultMargin, bottom: 0, right: Constants.defaultMargin)
+    }
+}
+
 extension HomeViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        rootView.searchController.dismiss(animated: true, completion: nil)
+        rootView.searchBar.resignFirstResponder()
         if let searchString = searchBar.text, searchString != self.searchString {
             self.searchString = searchString
             viewModel.resetData()
-            rootView.tableView.reloadData()
+            rootView.collectionView.reloadData()
             rootView.showLoadingIndicator()
             viewModel.getItems(searchString: searchString) { _ in
                 self.rootView.hideLoadingIndicator()
-                self.rootView.tableView.reloadData()
+                self.rootView.collectionView.reloadData()
             }
         }
     }
