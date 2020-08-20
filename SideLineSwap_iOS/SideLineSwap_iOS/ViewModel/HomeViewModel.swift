@@ -19,11 +19,9 @@ class HomeViewModel {
     func getItems(searchString: String, completion: @escaping ([IndexPath]) -> Void) {
         guard !isFetching else { return }
         isFetching = true
-        print(currentPage)
         self.currentPage += 1
         networkClient.get(searchString: searchString, page: currentPage) { response in
             self.total = response.meta.paging.total
-            print(self.total, "total")
             let cellModels = response.data.map {
                 CellModel(title: $0.name,
                           price: "$" + $0.price.dropTrailingZeroes,
@@ -34,7 +32,6 @@ class HomeViewModel {
                 let indexPathsToReload = self.calculateIndexPathsToReload(itemCount: cellModels.count)
                 self.isFetching = false
                 self.data.append(contentsOf: cellModels)
-                // calculate indexpaths to reload
                 completion(indexPathsToReload)
             }
         }
@@ -47,7 +44,7 @@ class HomeViewModel {
     }
     
     private func calculateIndexPathsToReload(itemCount: Int) -> [IndexPath] {
-        let start = data.count // currentPage * 20
+        let start = data.count
         let end = start + itemCount
         return (start..<end).map { IndexPath(row: $0, section: 0) }
     }

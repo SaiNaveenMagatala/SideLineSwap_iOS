@@ -25,24 +25,15 @@ class HomeViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         rootView.tableView.dataSource = self
-        rootView.tableView.prefetchDataSource = self
         rootView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell.self")
         
         rootView.searchController.searchBar.delegate = self
-    }
-    
-    func getVisibleIndexPathsToReload(indexPathsToReload: [IndexPath]) -> [IndexPath] {
-        if let visbleIndexPaths = rootView.tableView.indexPathsForVisibleRows {
-            let set = Set(visbleIndexPaths)
-            return Array(set.intersection(indexPathsToReload))
-        }
-        return []
     }
 }
 
 extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.total
+        return viewModel.data.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -53,21 +44,14 @@ extension HomeViewController: UITableViewDataSource {
                            tableView: tableView,
                            indexPath: indexPath,
                            cache: cache)
-        } else {
-            // put some loading spinner
         }
-        return cell
-    }
-}
-
-extension HomeViewController: UITableViewDataSourcePrefetching {
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        if indexPaths.contains(where: { $0.row > viewModel.data.count }) {
+        
+        if indexPath.row == viewModel.data.count - 10 {
             viewModel.getItems(searchString: searchString) { indexPathsToReload in
-                let visibleIndexPathsToReload = self.getVisibleIndexPathsToReload(indexPathsToReload: indexPathsToReload)
-                self.rootView.tableView.reloadRows(at: visibleIndexPathsToReload, with: .automatic)
+                self.rootView.tableView.insertRows(at: indexPathsToReload, with: .automatic)
             }
         }
+        return cell
     }
 }
 
