@@ -20,10 +20,10 @@ struct ItemModel: Decodable {
     let seller: Seller
     
     struct Image: Decodable {
-        let smallUrl: String
+        let thumbUrl: String
         
         enum CodingKeys: String, CodingKey {
-            case smallUrl = "small_url"
+            case thumbUrl = "thumb_url"
         }
     }
     

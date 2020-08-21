@@ -35,7 +35,7 @@ class SearchResultsViewModel {
                     CellModel(title: $0.name,
                               price: "$" + $0.price.dropTrailingZeroes,
                               sellerName: $0.seller.badges.first?.name,
-                              imageUrl: $0.images.first?.smallUrl)
+                              imageUrl: $0.images.first?.thumbUrl)
                 }
                 DispatchQueue.main.async {
                     let indexPathsToReload = self.calculateIndexPathsToReload(itemCount: cellModels.count)
