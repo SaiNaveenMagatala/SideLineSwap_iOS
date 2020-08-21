@@ -24,10 +24,7 @@ class HomeViewController: UIViewController {
         title = "Search Results"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        rootView.collectionView.dataSource = self
-        rootView.collectionView.delegate = self
-        rootView.collectionView.register(SearchResultsCollectionViewCell.self,
-                                         forCellWithReuseIdentifier: "SearchResultsCollectionViewCell.self")
+        rootView.configureCollectionView(with: self)
         
         rootView.searchBar.delegate = self
     }
@@ -84,13 +81,19 @@ extension HomeViewController: UISearchBarDelegate {
         rootView.searchBar.resignFirstResponder()
         rootView.searchBar.setShowsCancelButton(false, animated: true)
         if let searchString = searchBar.text, searchString != self.searchString {
-            self.searchString = searchString
             viewModel.resetData()
             rootView.collectionView.reloadData()
             rootView.showLoadingIndicator()
-            viewModel.getItems(searchString: searchString) { _ in
+            viewModel.getItems(searchString: searchString) { result in
                 self.rootView.hideLoadingIndicator()
-                self.rootView.collectionView.reloadData()
+                switch result {
+                case .success:
+                    self.searchString = searchString
+                    self.rootView.configureForSucess()
+                    self.rootView.collectionView.reloadData()
+                case let .failure(error):
+                    self.rootView.configure(for: error)
+                }
             }
         }
     }

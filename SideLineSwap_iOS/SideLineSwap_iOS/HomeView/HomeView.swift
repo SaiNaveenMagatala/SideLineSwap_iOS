@@ -11,10 +11,15 @@ import SnapKit
 
 class HomeView: UIView {
     
-    lazy var collectionViewLayout = UICollectionViewFlowLayout()
-    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
     let searchBar = UISearchBar()
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
+    private lazy var collectionViewLayout = UICollectionViewFlowLayout()
     private let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+    
+    // MARK: Error
+    private let errorImageView = UIImageView()
+    private let errorMessageLabel = UILabel()
+    private let errorView = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,6 +54,27 @@ class HomeView: UIView {
             make.leading.trailing.bottom.equalToSuperview()
         }
         
+        addSubview(errorView)
+        errorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.leading.equalToSuperview().offset(Constants.defaultMargin)
+            make.trailing.equalToSuperview().inset(Constants.defaultMargin)
+            make.height.equalTo(220)
+        }
+        errorView.addSubview(errorImageView)
+        errorImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(100)
+            make.top.centerX.equalToSuperview()
+        }
+        
+        errorView.addSubview(errorMessageLabel)
+        errorMessageLabel.numberOfLines = 2
+        errorMessageLabel.textAlignment = .center
+        errorMessageLabel.snp.makeConstraints { make in
+            make.top.equalTo(errorImageView.snp.bottom).offset(20)
+            make.centerX.equalToSuperview()
+        }
+        errorView.isHidden = true
     }
     
     func showLoadingIndicator() {
@@ -63,4 +89,28 @@ class HomeView: UIView {
         loadingIndicator.hidesWhenStopped = true
     }
     
+    func configure(for error: SearchError) {
+        collectionView.isHidden = true
+        errorView.isHidden = false
+        switch error {
+        case .disconnectedNetwork:
+            errorImageView.image = #imageLiteral(resourceName: "disconnectedNetwork")
+            errorMessageLabel.text = Constants.disconnectedNetworkText
+        case .backendError:
+            errorImageView.image = #imageLiteral(resourceName: "warning")
+            errorMessageLabel.text = Constants.backendErrorText
+        }
+    }
+    
+    func configureForSucess() {
+        errorView.isHidden = true
+        collectionView.isHidden = false
+    }
+    
+    func configureCollectionView(with vc: HomeViewController) {
+        collectionView.dataSource = vc
+        collectionView.delegate = vc
+        collectionView.register(SearchResultsCollectionViewCell.self,
+                                         forCellWithReuseIdentifier: "SearchResultsCollectionViewCell.self")
+    }
 }
