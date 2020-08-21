@@ -38,11 +38,14 @@ class NetworkClientImpl: NetworkClient {
                 completion(.failure(.backendError))
                 return
             }
-            if let data = data {
+            if let data = data, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                 let jsonDecoder = JSONDecoder()
                 if let model = try? jsonDecoder.decode(ItemResponseModel.self, from: data) {
                     completion(.success(model))
                 }
+            } else {
+                completion(.failure(.backendError))
+                return
             }
         }.resume()
     }
