@@ -13,9 +13,16 @@ enum SearchError: Error {
     case backendError
 }
 
-class NetworkClient {
-    // TODO: Error handling and clean up
-    func get(searchString: String, page: Int, completion: @escaping (Result<ItemResponseModel, SearchError>) -> Void) {
+protocol NetworkClient {
+    func get(searchString: String,
+             page: Int,
+             completion: @escaping (Result<ItemResponseModel, SearchError>) -> Void)
+}
+
+class NetworkClientImpl: NetworkClient {
+    func get(searchString: String,
+             page: Int,
+             completion: @escaping (Result<ItemResponseModel, SearchError>) -> Void) {
         let rawUrlStr = Constants.getItemsUrlStr
         let urlStr = String(format: rawUrlStr, searchString, page)
             .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)

@@ -25,7 +25,6 @@ class HomeViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         rootView.configureCollectionView(with: self)
-        
         rootView.searchBar.delegate = self
     }
 }
@@ -45,7 +44,7 @@ extension HomeViewController: UICollectionViewDataSource {
                            cache: cache)
         }
         
-        if indexPath.row == viewModel.data.count - 10 {
+        if shouldPrefetch(for: indexPath.row) {
             viewModel.getItems(searchString: searchString) { result in
                 switch result {
                 case let .success(indexPathsToInsert):
@@ -56,6 +55,10 @@ extension HomeViewController: UICollectionViewDataSource {
             }
         }
         return cell
+    }
+    
+    private func shouldPrefetch(for row: Int) -> Bool {
+        row == viewModel.data.count - 10
     }
 }
 

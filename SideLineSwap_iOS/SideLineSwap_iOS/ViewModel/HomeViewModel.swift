@@ -9,12 +9,19 @@
 import Foundation
 
 class HomeViewModel {
-    // TODO: Inject and unit test?
-    let networkClient = NetworkClient()
+    let networkClient: NetworkClient
     private var isFetching = false
     private var currentPage = 0
     var total = 0
     var data = [CellModel]()
+    
+    init(networkClient: NetworkClient) {
+        self.networkClient = networkClient
+    }
+    
+    convenience init() {
+        self.init(networkClient: NetworkClientImpl())
+    }
     
     func getItems(searchString: String, completion: @escaping (Result<[IndexPath], SearchError>) -> Void) {
         guard !isFetching, (data.count == 0 || data.count < total) else { return }
