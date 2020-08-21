@@ -1,5 +1,5 @@
 //
-//  HomeViewModel.swift
+//  SearchResultsViewModel.swift
 //  SideLineSwap_iOS
 //
 //  Created by Naveen Magatala on 8/18/20.
@@ -8,8 +8,8 @@
 
 import Foundation
 
-class HomeViewModel {
-    let networkClient: NetworkClient
+class SearchResultsViewModel {
+    private let networkClient: NetworkClient
     private var isFetching = false
     private var currentPage = 0
     var total = 0

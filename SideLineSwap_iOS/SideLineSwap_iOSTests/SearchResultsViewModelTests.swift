@@ -12,13 +12,13 @@ import XCTest
 @testable import SideLineSwap_iOS
 
 class SearchResultsViewModelTests: XCTestCase {
-    var subject: HomeViewModel!
+    var subject: SearchResultsViewModel!
     var fakeNetworkClient: FakeNetworkClient!
     
     override func setUp() {
         super.setUp()
         fakeNetworkClient = FakeNetworkClient()
-        subject = HomeViewModel(networkClient: fakeNetworkClient)
+        subject = SearchResultsViewModel(networkClient: fakeNetworkClient)
     }
     
     func testWhenGetItemsIsCalled() {

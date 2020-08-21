@@ -1,5 +1,5 @@
 //
-//  HomeViewController.swift
+//  SearchResultsController.swift
 //  SideLineSwap_iOS
 //
 //  Created by Naveen Magatala on 8/18/20.
@@ -8,10 +8,10 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
+class SearchResultsViewController: UIViewController {
     
-    private let rootView = HomeView()
-    private let viewModel = HomeViewModel()
+    private let rootView = SearchResultsView()
+    private let viewModel = SearchResultsViewModel()
     private let cache = NSCache<NSString, UIImage>()
     private var searchString = ""
     
@@ -29,7 +29,7 @@ class HomeViewController: UIViewController {
     }
 }
 
-extension HomeViewController: UICollectionViewDataSource {
+extension SearchResultsViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         viewModel.data.count
@@ -62,7 +62,7 @@ extension HomeViewController: UICollectionViewDataSource {
     }
 }
 
-extension HomeViewController: UICollectionViewDelegateFlowLayout {
+extension SearchResultsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let viewWidth = view.frame.width
         let padding = Constants.defaultMargin * 3
@@ -79,7 +79,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension HomeViewController: UISearchBarDelegate {
+extension SearchResultsViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         rootView.searchBar.resignFirstResponder()
         rootView.searchBar.setShowsCancelButton(false, animated: true)
