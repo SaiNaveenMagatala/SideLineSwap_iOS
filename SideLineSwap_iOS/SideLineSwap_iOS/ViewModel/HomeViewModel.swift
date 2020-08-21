@@ -37,7 +37,10 @@ class HomeViewModel {
                     completion(.success(indexPathsToReload))
                 }
             case let .failure(error):
-                completion(.failure(error))
+                DispatchQueue.main.async {
+                    self.isFetching = false
+                    completion(.failure(error))
+                }
             }
         }
     }

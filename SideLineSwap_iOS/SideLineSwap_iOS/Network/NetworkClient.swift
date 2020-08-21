@@ -20,7 +20,17 @@ class NetworkClient {
         let urlStr = String(format: rawUrlStr, searchString, page)
             .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         guard let sanitizedStr = urlStr, let url = URL(string: sanitizedStr) else { return }
-        URLSession.shared.dataTask(with: url) { data, _, error in
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if error != nil {
+                if let err = error as NSError? {
+                    if err.code == Constants.disconnectedNetworkErrorCode {
+                        completion(.failure(.disconnectedNetwork))
+                        return
+                    }
+                }
+                completion(.failure(.backendError))
+                return
+            }
             if let data = data {
                 let jsonDecoder = JSONDecoder()
                 if let model = try? jsonDecoder.decode(ItemResponseModel.self, from: data) {
