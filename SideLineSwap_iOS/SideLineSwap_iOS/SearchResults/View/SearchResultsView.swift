@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  SearchResults.swift
 //  SideLineSwap_iOS
 //
 //  Created by Naveen Magatala on 8/18/20.
@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class HomeView: UIView {
+class SearchResultsView: UIView {
     
     let searchBar = UISearchBar()
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
@@ -107,7 +107,7 @@ class HomeView: UIView {
         collectionView.isHidden = false
     }
     
-    func configureCollectionView(with vc: HomeViewController) {
+    func configureCollectionView(with vc: SearchResultsViewController) {
         collectionView.dataSource = vc
         collectionView.delegate = vc
         collectionView.register(SearchResultsCollectionViewCell.self,
